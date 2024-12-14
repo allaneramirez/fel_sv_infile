@@ -7,7 +7,7 @@
     'description': """ Integración con factura electrónica de Infile """,
     'author': 'aquíH',
     'website': 'http://aquih.com/',
-    'depends': ['fel_sv', 'point_of_sale'],
+    'depends': ['fel_sv'],
     'data': [
         'views/account_view.xml',
     ],

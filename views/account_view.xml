@@ -1,32 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
     <data>
 
-        <record model="ir.ui.view" id="invoice_form_fel_infile">
-            <field name="name">ccount.invoice.form.fel_infile</field>
-            <field name="model">account.invoice</field>
-            <field name="inherit_id" ref="fel_sv.invoice_form_fel_sv"/>
+        <record model="ir.ui.view" id="view_move_form_fel_sv_infile">
+            <field name="name">account.move.form.fel_sv_infile</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="fel_sv.view_move_form_fel_sv"/>
             <field name="arch" type="xml">
                 <data>
-                    <field name="resultado_xml_fel_sv" position="after">
+                    <field name="numero_control" position="after">
                         <field name="pdf_fel_sv" widget="url"/>
                     </field>
                 </data>
             </field>
         </record>
 
-        <record model="ir.ui.view" id="journal_form_fel_infile">
-            <field name="name">account.journal.form.fel_infile</field>
-            <field name="model">account.journal</field>
-            <field name="inherit_id" ref="fel_sv.journal_form_fel_sv"/>
-            <field name="arch" type="xml">
-                <data>
-                </data>
-            </field>
-        </record>
 
-        <record id="view_company_form_fel_infile" model="ir.ui.view">
-            <field name="name">res.company.form.fel_infile</field>
+
+        <record id="view_company_form_fel_sv_infile" model="ir.ui.view">
+            <field name="name">res.company.form.fel_sv_infile</field>
             <field name="model">res.company</field>
             <field name="inherit_id" ref="fel_sv.view_company_form_fel_sv"/>
             <field name="arch" type="xml">
@@ -41,4 +33,4 @@
         </record>
 
     </data>
-</openerp>
+</odoo>
