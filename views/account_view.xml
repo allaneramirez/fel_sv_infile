@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <data>
                     <field name="numero_control" position="after">
-                        <field name="pdf_fel_sv" widget="url"/>
+                        <field name="pdf_fel_sv" widget="url" groups="l10n_sv.group_fel_restricted_fields_sv"/>
                     </field>
                 </data>
             </field>
@@ -24,9 +24,9 @@
             <field name="arch" type="xml">
                 <data>
                     <field name="certificador_fel_sv" position="before">
-                        <field name="usuario_fel_sv"/>
-                        <field name="llave_fel_sv"/>
-                        <field name="pruebas_fel_sv"/>
+                        <field name="usuario_fel_sv" groups="l10n_sv.group_fel_restricted_fields_sv"/>
+                        <field name="llave_fel_sv" groups="l10n_sv.group_fel_restricted_fields_sv"/>
+                        <field name="pruebas_fel_sv" groups="l10n_sv.group_fel_restricted_fields_sv"/>
                     </field>
                 </data>
             </field>
