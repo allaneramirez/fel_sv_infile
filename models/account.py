@@ -237,7 +237,7 @@ class AccountMove(models.Model):
                 else:
                     factura.numero_control = ""
                     if certificacion_json["errores"]:
-                        factura.error_certificador_sv(str(certificacion_json["errores"])+ f' Numero Control: {mumero_control}')
+                        factura.error_certificador_sv(str(certificacion_json["errores"])+ f' Numero Control: {mumero_control} \n\n JSON:{factura_json}')
 
 
 
