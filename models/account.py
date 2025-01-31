@@ -52,7 +52,6 @@ class AccountMove(models.Model):
                 forma_pago_fel_sv = factura.forma_pago_fel_sv or factura.journal_id.forma_pago_fel_sv
                 lineas_plazo_pago = factura.invoice_payment_term_id.line_ids
                 for line in lineas_plazo_pago:
-                    print(line.days,"days!!!!")
                     if line.days:
                         plazo_credito = '01'
                         periodo_credito = line.days
@@ -62,6 +61,7 @@ class AccountMove(models.Model):
                         periodo_credito = line.months
                         condicion_pago_fel_sv = 2
                 ######### NUMERO DE CONTROL #####################
+                #sequence_obj = factura.journal_id.sequence_id_sv
                 sequence_obj = factura.journal_id.sequence_id
 
                 if not sequence_obj:
@@ -111,8 +111,10 @@ class AccountMove(models.Model):
                         receptor['tipo_persona'] = int(factura.partner_id.tipo_persona)
 
 
+
                     if tipo_documento != '14':
                         factura_json['documento']['receptor'] = receptor
+
                     # SI ES FACTRUA SUEJTO EXCLUIDA CAMBIAMOS EL NOMBRE DE LA LLAVE Y AGREGAMOS LA DIRECCION
                     else:
                         receptor['direccion'] = {
@@ -121,6 +123,7 @@ class AccountMove(models.Model):
                             'complemento': factura.partner_id.street or ''
                         }
                         factura_json['documento']['sujeto_excluido'] = receptor
+                        incluir_impuestos = False
 
                 elif tipo_documento in ['03', '04', '05']:
                     # SI ES NOTA DE CREDITO AGREGAMOS EL DOC RELACIONADO
@@ -155,17 +158,24 @@ class AccountMove(models.Model):
 
                 ###### ITEMS ###############
                 items = [];
+                # SUMA TOTAL DE RENTA A RETENER
+                impuesto_fse = 0
                 for linea in factura.invoice_line_ids:
                     impuestos = 0
+
                     r = linea.tax_ids.compute_all(linea.price_unit, currency=factura.currency_id, quantity=1,
                                                   product=linea.product_id, partner=factura.partner_id)
                     precio_unitario = linea.price_unit
                     precio_unitario_fel = r['total_included']
+
                     if not incluir_impuestos and len(linea.tax_ids) > 0:
                         precio_unitario_fel = r['total_excluded']
                         # Para calcular los impuestos, es necesario quitar el descuento y tomar en cuenta todas las cantidades
                         impuestos = (r['total_included'] - r['total_excluded']) * linea.quantity
-                        print(impuestos,r['total_included'],r['total_excluded'],"ssssss")
+                        impuesto_fse += (r['total_included'] - r['total_excluded']) * linea.quantity
+                        # DESGLOCE PARA FACTURA DE SUEJTO EXCLUIDO
+                        if tipo_documento == "14" and impuesto_fse:
+                            factura_json['documento']['renta_retenida'] = self.formato_float(abs(impuesto_fse),2)
                     monto_descuento = (linea.discount / 100) * (precio_unitario * linea.quantity)
                     item = {
                         'cantidad': int(linea.quantity),
@@ -189,7 +199,7 @@ class AccountMove(models.Model):
                         item['numero_documento'] = factura.firma_fel_sv
                     # SINO INCLUIMOS EL IMPUESTO EN EL TOTAL QUIERE DECIR QUE HAY QUE DESGLOSAR EL IMPUESTO
                     # ESTO ES PARA COMPROBANTE FISCAL
-                    if not incluir_impuestos:
+                    if not incluir_impuestos and tipo_documento != '14':
                         item['tributos'] = [{ 'codigo': '20', 'monto': self.formato_float(impuestos, 4) }]
 
                     items.append(item)
@@ -238,8 +248,6 @@ class AccountMove(models.Model):
                     factura.numero_control = ""
                     if certificacion_json["errores"]:
                         factura.error_certificador_sv(str(certificacion_json["errores"])+ f' Numero Control: {mumero_control} \n\n JSON:{factura_json}')
-
-
 
 
         return True
