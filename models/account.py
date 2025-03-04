@@ -61,8 +61,7 @@ class AccountMove(models.Model):
                         periodo_credito = line.months
                         condicion_pago_fel_sv = 2
                 ######### NUMERO DE CONTROL #####################
-                #sequence_obj = factura.journal_id.sequence_id_sv
-                sequence_obj = factura.journal_id.sequence_id
+                sequence_obj = factura.journal_id.sequence_id_sv
 
                 if not sequence_obj:
                     raise UserError("No se ha configurado una secuencia fel para este diario.")
@@ -229,7 +228,7 @@ class AccountMove(models.Model):
                     "identificador": factura.journal_id.code+str(factura.id),
                 }
                 print(factura_json,"factura json!!!")
-                url = 'https://sandbox-certificador.infile.com.sv/api/v1/certificacion/test/documento/certificar'
+                url = 'https://certificador.infile.com.sv/api/v1/certificacion/prod/documento/certificar'
                 if factura.company_id.pruebas_fel_sv:
                     url = 'https://certificador.infile.com.sv/api/v1/certificacion/test/documento/certificar'
                 print(headers,factura_json)
@@ -284,7 +283,7 @@ class AccountMove(models.Model):
                     "usuario": factura.company_id.usuario_fel_sv,
                     "llave": factura.company_id.llave_fel_sv,
                 }
-                url = 'https://sandbox-certificador.infile.com.sv/api/v1/certificacion/test/documento/invalidacion'
+                url = 'https://certificador.infile.com.sv/api/v1/certificacion/prod/documento/invalidacion'
                 if factura.company_id.pruebas_fel_sv:
                     url = 'https://certificador.infile.com.sv/api/v1/certificacion/test/documento/invalidacion'
                 print(invalidacion_json,"json")
