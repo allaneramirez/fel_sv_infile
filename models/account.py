@@ -26,6 +26,7 @@ class AccountMove(models.Model):
     def certificar_sv(self):
         for factura in self:
             if factura.requiere_certificacion_sv():
+                print("hola we!!")
                 self.ensure_one()
 
                 if factura.error_pre_validacion_sv():
@@ -97,7 +98,7 @@ class AccountMove(models.Model):
                         "tipo_documento": tipo_doc_recep,
                         "numero_documento":  num_documeto,
                         'nombre': nombre,
-                        "correo": correo,
+                        "correos_cc": correo,
                         "telefono": tel
 
                     }
@@ -129,8 +130,8 @@ class AccountMove(models.Model):
                     if tipo_documento == '05':
                         doc_relacionados = [{
                             "tipo_documento": "03",
-                            "tipo_generacion": 2,
-                            "numero_documento": factura.firma_fel_sv,
+                            "tipo_generacion": 1 if factura.numero_documento_fisico else 2,
+                            "numero_documento": factura.numero_documento_fisico if factura.numero_documento_fisico else factura.firma_fel_sv,
                             "fecha_emision": str(factura.date)
                       }]
                         factura_json['documento']['documentos_relacionados'] = doc_relacionados
@@ -143,7 +144,8 @@ class AccountMove(models.Model):
                         'nombre': nombre,
                         'codigo_actividad': codigo_actividad,
                         'nombre_comercial': nombre_comercial,
-                        'correo': correo,
+                        'correo':correo.split(';')[0].strip() if ";" in correo else correo,
+                        'correos_cc': correo,
                         'direccion': {
                             'departamento': departamento,
                             'municipio': municipio,
@@ -195,7 +197,7 @@ class AccountMove(models.Model):
                         item['tipo'] = 1 if linea.product_id.type != 'service' else 2
                     # SI ES NOTA DE CREDTIO AGREGAMOS EL DOC RELACIONADO
                     if tipo_documento == '05':
-                        item['numero_documento'] = factura.firma_fel_sv
+                        item['numero_documento'] = factura.numero_documento_fisico if factura.numero_documento_fisico else factura.firma_fel_sv
                     # SINO INCLUIMOS EL IMPUESTO EN EL TOTAL QUIERE DECIR QUE HAY QUE DESGLOSAR EL IMPUESTO
                     # ESTO ES PARA COMPROBANTE FISCAL
                     if not incluir_impuestos and tipo_documento != '14':
@@ -223,15 +225,14 @@ class AccountMove(models.Model):
 
                 headers = {
                     "Content-Type": "application/json",
-                    "usuario": factura.company_id.usuario_fel_sv,
-                    "llave": factura.company_id.llave_fel_sv,
+                    "usuario": "06141801161027" or factura.company_id.usuario_fel_sv,
+                    "llave": "f6fe07bc21d1e8e9503d3a6af082133e" or factura.company_id.llave_fel_sv,
                     "identificador": factura.journal_id.code+str(factura.id),
                 }
-                print(factura_json,"factura json!!!")
+
                 url = 'https://certificador.infile.com.sv/api/v1/certificacion/prod/documento/certificar'
                 if factura.company_id.pruebas_fel_sv:
-                    url = 'https://certificador.infile.com.sv/api/v1/certificacion/test/documento/certificar'
-                print(headers,factura_json)
+                    url = 'https://sandbox-certificador.infile.com.sv/api/v1/certificacion/test/documento/certificar'
                 r = requests.post(url, json=factura_json, headers=headers)
 
                 logging.warning(r.text,"texttt!!!")
@@ -270,7 +271,8 @@ class AccountMove(models.Model):
                         'nombre': factura.solicitante_fel_sv_id.name,
                         'tipo_documento': factura.solicitante_fel_sv_id.tipo_documento_fel,
                         'numero_documento': factura.solicitante_fel_sv_id.vat,
-                        'correo': factura.solicitante_fel_sv_id.email,
+                        'correo': factura.solicitante_fel_sv_id.email.split(';')[0].strip() if ";" in factura.solicitante_fel_sv_id.email else factura.solicitante_fel_sv_id.email,
+
                     }
                 }}
 
