@@ -271,7 +271,7 @@ class AccountMove(models.Model):
                         'nombre': factura.solicitante_fel_sv_id.name,
                         'tipo_documento': factura.solicitante_fel_sv_id.tipo_documento_fel,
                         'numero_documento': factura.solicitante_fel_sv_id.vat,
-                        'correo': factura.solicitante_fel_sv_id.email.split(';')[0].strip() if ";" in factura.solicitante_fel_sv_id.email else factura.solicitante_fel_sv_id.email,
+                        'correo': factura.solicitante_fel_sv_id.email,
 
                     }
                 }}
