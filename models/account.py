@@ -225,8 +225,8 @@ class AccountMove(models.Model):
 
                 headers = {
                     "Content-Type": "application/json",
-                    "usuario": "06141801161027" or factura.company_id.usuario_fel_sv,
-                    "llave": "f6fe07bc21d1e8e9503d3a6af082133e" or factura.company_id.llave_fel_sv,
+                    "usuario":  factura.company_id.usuario_fel_sv,
+                    "llave": factura.company_id.llave_fel_sv,
                     "identificador": factura.journal_id.code+str(factura.id),
                 }
 
@@ -248,7 +248,6 @@ class AccountMove(models.Model):
                     factura.numero_control = ""
                     if certificacion_json["errores"]:
                         factura.error_certificador_sv(str(certificacion_json["errores"])+ f' Numero Control: {mumero_control} \n\n JSON:{factura_json}')
-
 
         return True
 
@@ -298,9 +297,6 @@ class AccountMove(models.Model):
                     factura.firma_fel_sv = certificacion_json["respuesta"]["codigoGeneracion"]
                     factura.sello_recepcion = certificacion_json["respuesta"]["selloRecepcion"]
                     factura.pdf_fel_sv = certificacion_json["pdf_path"]
-
-
-
                 else:
                     raise UserError(str(certificacion_json["errores"]))
 
